@@ -3,11 +3,6 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { NotFoundPage } from '../pages/NotFoundPage';
 
-// Mock the image import so bundlers don't complain
-vi.mock('../assets/404.webp', () => ({
-  default: 'test-image.jpg',
-}));
-
 describe('NotFoundPage', () => {
   function renderWithRouter() {
     return render(
@@ -22,10 +17,9 @@ describe('NotFoundPage', () => {
 
   it('renders the 404 image', () => {
     renderWithRouter();
+    const lottie = screen.getByTestId("mock-lottie");
+    expect(lottie).toBeInTheDocument();
 
-    const img = screen.getByAltText('Page not found');
-    expect(img).toBeInTheDocument();
-    expect(img).toHaveAttribute('src', 'test-image.jpg');
   });
 
   it('renders the not found message', () => {

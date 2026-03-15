@@ -13,7 +13,7 @@ export const StyledAppBar = styled(AppBar)`
     left: 0;
     background-color: #e4e5e6;
     color: #000;
-    z-index: 1000;
+    z-index: 20;
   }
 `;
 
@@ -191,7 +191,7 @@ export const BottomNavContainer = styled.div`
   justify-content: space-between;
   padding: 0 16px;
 
-  z-index: 2000;
+  z-index: 20;
 
   @media (min-width: 520px) {
     display: none;

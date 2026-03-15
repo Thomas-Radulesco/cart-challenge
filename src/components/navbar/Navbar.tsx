@@ -12,10 +12,8 @@ import { useCart } from '../../contexts/CartContext';
 import { useUser } from '../../contexts/UserContext';
 import {
   AllProductsCategory,
-  useCategories,
   capitalizeCategory,
 } from '../../hooks/useCategories';
-import { useProducts } from '../../hooks/useProducts';
 import companyLogo from '../../assets/company_logo.png';
 import PersonIcon from '@mui/icons-material/Person';
 import LoginIcon from '@mui/icons-material/Login';
@@ -33,6 +31,8 @@ import {
   Highlight,
   SearchIconWrapper,
 } from './Navbar.styles';
+import { useProductsContext } from '@/contexts/ProductsContext';
+import { useCategoriesContext } from '@/contexts/CategoriesContext';
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -45,10 +45,10 @@ export default function Navbar() {
   const { user, logout } = useUser();
 
   // PRODUCTS (for suggestions)
-  const { products: allProducts } = useProducts();
+  const { products: allProducts } = useProductsContext();
 
   // CATEGORIES
-  const { categories } = useCategories();
+  const { categories } = useCategoriesContext();
   const [selectedCategory, setSelectedCategory] = useState(AllProductsCategory);
 
   // CATEGORY DROPDOWN STATE

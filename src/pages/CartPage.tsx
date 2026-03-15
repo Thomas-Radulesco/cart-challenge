@@ -39,13 +39,6 @@ const ProductWrapper = styled(Link)`
   text-decoration: none;
   color: ${secondary.color};
 
-  // &:hover,
-  // &:focus,
-  // &:visited {
-  //   text-decoration: none;
-  //   color: ${secondary.color};
-  // }
-
   &:hover {
     box-shadow: 0 2px 8px ${productTheme.cardShadow};
   }

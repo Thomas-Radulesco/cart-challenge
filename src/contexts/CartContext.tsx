@@ -34,7 +34,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   });
   const cartCount = state.items.reduce((sum, item) => sum + item.quantity, 0);
 
-  // Store API //
+  // Store API
   const add = (item: CartItem) => dispatch(addItem(item));
   const remove = (id: number) => dispatch(removeItem(id));
   const increment = (id: number) => dispatch(incrementItem(id));

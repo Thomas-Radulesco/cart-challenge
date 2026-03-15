@@ -32,7 +32,6 @@ export default defineConfig({
     env: {
       VITE_API_URL: "https://api.example.com",
     },
-    // setupFiles: ["./src/tests/setup.ts", "./src/tests/setup-router-mock.ts"],
     setupFiles: ["./src/tests/setup.ts"],
     include: ["src/tests/**/*.{test,spec}.{ts,tsx}"],
     exclude: [...configDefaults.exclude, "dist", "build"],
@@ -43,6 +42,14 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
+      ...(process.env.VITEST
+        ? {
+            "lottie-react": path.resolve(
+              __dirname,
+              "src/__mocks__/lottie-react.tsx"
+            ),
+          }
+        : {}),
     },
   },
 
