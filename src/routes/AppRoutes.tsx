@@ -9,21 +9,15 @@ import { BottomNav } from '../components/navbar/BottomNav';
 import { PageContainer } from '../components/layout/Layout.styles';
 import { ProductPage } from '../pages/ProductPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
-// import { ProductsProvider } from '@/contexts/ProductsContext';
-// import { CategoriesProvider } from '@/contexts/CategoriesContext';
 
 function Layout() {
   return (
     <>
-      {/* <ProductsProvider>
-         <CategoriesProvider> */}
       <Navbar />
       <BottomNav />
       <PageContainer>
         <Outlet />
       </PageContainer>
-      {/* </CategoriesProvider>
-      </ProductsProvider> */}
     </>
   );
 }

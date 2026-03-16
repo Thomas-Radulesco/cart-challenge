@@ -8,11 +8,11 @@ import {
   Price,
 } from './Product.styles';
 import { PrimaryButton } from '../common/Buttons';
-import { useCart } from '../../contexts/CartContext';
+import { useCart } from '@/contexts/CartContext';
 import { QuantityControls } from '../common/QuantityControls';
 import { AddShoppingCart } from '@mui/icons-material';
 import styled from 'styled-components';
-import { formatPrice } from '../../utils/formatPrice';
+import { formatPrice } from '@/utils/formatPrice';
 
 const StyledAddIcon = styled(AddShoppingCart)`
   margin-left: 25px;

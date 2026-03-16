@@ -8,12 +8,12 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { useCart } from '../../contexts/CartContext';
-import { useUser } from '../../contexts/UserContext';
+import { useCart } from '@/contexts/CartContext';
+import { useUser } from '@/contexts/UserContext';
 import {
   AllProductsCategory,
   capitalizeCategory,
-} from '../../hooks/useCategories';
+} from '../../utils/categories';
 import companyLogo from '../../assets/company_logo.png';
 import PersonIcon from '@mui/icons-material/Person';
 import LoginIcon from '@mui/icons-material/Login';
@@ -68,11 +68,14 @@ export default function Navbar() {
 
     setSelectedCategory(capitalizedCategory);
 
+    const params = new URLSearchParams(location.search);
+
     if (cat === AllProductsCategory) {
-      navigate('/');
+      params.delete("cat");
     } else {
-      navigate(`/category/${cat.toLowerCase()}`);
+      params.set("cat", cat.toLowerCase());
     }
+    navigate(`/search?${params.toString()}`);
 
     handleCloseCategories();
   };
@@ -123,12 +126,23 @@ export default function Navbar() {
       return;
     }
 
-    const matches = allProducts
+    let matches = allProducts;
+
+    // Apply category filter first
+    if (selectedCategory !== AllProductsCategory) {
+      matches = matches.filter(
+        (p) =>
+          p.category.toLowerCase() === selectedCategory.toLowerCase()
+      );
+    }
+
+    // Then apply search term
+    const suggestions = matches
       .filter((p) => p.title.toLowerCase().includes(value.toLowerCase()))
       .slice(0, 10)
       .map((p) => p.title);
 
-    setSuggestions(matches);
+    setSuggestions(suggestions);
   };
 
   // SUBMIT SEARCH
@@ -144,7 +158,13 @@ export default function Navbar() {
 
   // CLICK SUGGESTION
   const handleSuggestionClick = (title: string) => {
-    navigate(`/search?q=${encodeURIComponent(title)}`);
+    setSearchTerm(title); // keep UI in sync
+    
+    const params = new URLSearchParams(location.search);
+    params.set("q", title);
+
+    navigate(`/search?${params.toString()}`);
+
     setSuggestions([]);
   };
 

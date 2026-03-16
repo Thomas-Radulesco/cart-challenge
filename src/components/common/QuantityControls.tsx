@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { useCart } from '../../contexts/CartContext';
+import { useCart } from '@/contexts/CartContext';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Add from '@mui/icons-material/Add';
 import Remove from '@mui/icons-material/Remove';

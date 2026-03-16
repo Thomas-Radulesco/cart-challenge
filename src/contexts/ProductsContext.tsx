@@ -64,3 +64,8 @@ export function useProductsContext() {
   }
   return ctx;
 }
+
+// Only used in tests
+export function __resetProductsCache() {
+  cachedProducts = null;
+}

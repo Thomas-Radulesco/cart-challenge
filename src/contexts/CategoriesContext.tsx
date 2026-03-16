@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { fetchCategories } from "../api/products";
+import { AllProductsCategory, capitalizeCategory } from "@/utils/categories";
 
 interface CategoriesContextValue {
   categories: string[] | null;
@@ -30,8 +31,12 @@ export function CategoriesProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     fetchCategories()
       .then((data) => {
-        cachedCategories = data;
-        setCategories(data);
+        const allCats = [AllProductsCategory, ...data];
+        const normalized = allCats.map(
+          (cat) => capitalizeCategory(cat),
+        );
+        cachedCategories = normalized;
+        setCategories(normalized);
       })
       .catch((err) => {
         setError(err instanceof Error ? err.message : "API error");
@@ -44,8 +49,12 @@ export function CategoriesProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     try {
       const data = await fetchCategories();
-      cachedCategories = data;
-      setCategories(data);
+      const allCats = [AllProductsCategory, ...data];
+      const normalized = allCats.map(
+        (cat) => capitalizeCategory(cat),
+      );
+      cachedCategories = normalized;
+      setCategories(normalized);
     } catch (err) {
       setError(err instanceof Error ? err.message : "API error");
     } finally {

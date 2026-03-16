@@ -1,8 +1,8 @@
-import { useUser } from '../contexts/UserContext';
+import { useUser } from '@/contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
-import { SecondaryButton } from '../components/common/Buttons';
+import { SecondaryButton } from '@/components/common/Buttons';
 import styled from 'styled-components';
-import { LinkButton } from '../components/common/Buttons';
+import { LinkButton } from '@/components/common/Buttons';
 
 const StyledSecondaryButton = styled(SecondaryButton)`
   && {

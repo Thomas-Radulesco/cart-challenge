@@ -1,4 +1,4 @@
-import { useCart } from '../contexts/CartContext';
+import { useCart } from '@/contexts/CartContext';
 import { DangerButton, LinkButton } from '../components/common/Buttons';
 import styled from 'styled-components';
 import DeleteIcon from '@mui/icons-material/Delete';

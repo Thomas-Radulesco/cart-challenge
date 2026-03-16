@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 import { SecondaryButton } from '../components/common/Buttons';
 import { Link } from 'react-router-dom';
-// import { useEffect } from "react";
 import Lottie from "lottie-react";
 import animation404 from "../assets/404.json";
 import { productTheme } from '@/utils/colors';

@@ -1,7 +1,7 @@
-import { useUser } from '../contexts/UserContext';
-import { SecondaryButton } from '../components/common/Buttons';
+import { useUser } from '@/contexts/UserContext';
+import { SecondaryButton } from '@/components/common/Buttons';
 import styled from 'styled-components';
-import { LinkButton } from '../components/common/Buttons';
+import { LinkButton } from '@/components/common/Buttons';
 
 const StyledSecondaryButton = styled(SecondaryButton)`
   && {

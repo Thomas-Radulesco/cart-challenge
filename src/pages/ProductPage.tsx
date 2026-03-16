@@ -1,15 +1,15 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import type { Product } from '../types/product';
+import type { Product } from '@/types/product';
 import { fetchProductById } from '@/api/products';
-import { PrimaryButton } from '../components/common/Buttons';
+import { PrimaryButton } from '@/components/common/Buttons';
 import styled from 'styled-components';
-import { useCart } from '../contexts/CartContext';
+import { useCart } from '@/contexts/CartContext';
 import { AddShoppingCart } from '@mui/icons-material';
-import { formatPrice } from '../utils/formatPrice';
-import { QuantityControls } from '../components/common/QuantityControls';
-import { SkeletonCard } from '../components/product/SkeletonCard';
-import { LinkButton } from '../components/common/Buttons';
+import { formatPrice } from '@/utils/formatPrice';
+import { QuantityControls } from '@/components/common/QuantityControls';
+import { SkeletonCard } from '@/components/product/SkeletonCard';
+import { LinkButton } from '@/components/common/Buttons';
 
 const StyledAddIcon = styled(AddShoppingCart)`
   margin-left: 25px;
