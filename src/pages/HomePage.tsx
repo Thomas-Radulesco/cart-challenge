@@ -115,7 +115,7 @@ export default function HomePage() {
       <PageHeader title={heading} />
 
       <div>
-        <h1>Products</h1>
+        <h3>Products</h3>
 
         <div
           data-testid="products-grid"

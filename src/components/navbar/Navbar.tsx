@@ -1,22 +1,27 @@
-import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useMediaQuery } from '@mui/material';
-import IconButton from '@mui/material/IconButton';
-import Badge from '@mui/material/Badge';
-import Button from '@mui/material/Button';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import SearchIcon from '@mui/icons-material/Search';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { useCart } from '@/contexts/CartContext';
-import { useUser } from '@/contexts/UserContext';
+import { useState, useEffect, useRef } from "react";
+import {
+  Link,
+  useNavigate,
+  useLocation,
+  useSearchParams,
+} from "react-router-dom";
+import { useMediaQuery } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
+import Badge from "@mui/material/Badge";
+import Button from "@mui/material/Button";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import SearchIcon from "@mui/icons-material/Search";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import { useCart } from "@/contexts/CartContext";
+import { useUser } from "@/contexts/UserContext";
 import {
   AllProductsCategory,
   capitalizeCategory,
-} from '../../utils/categories';
-import companyLogo from '../../assets/company_logo.png';
-import PersonIcon from '@mui/icons-material/Person';
-import LoginIcon from '@mui/icons-material/Login';
+} from "../../utils/categories";
+import companyLogo from "../../assets/company_logo.png";
+import PersonIcon from "@mui/icons-material/Person";
+import LoginIcon from "@mui/icons-material/Login";
 import {
   StyledAppBar,
   StyledToolbar,
@@ -30,14 +35,17 @@ import {
   SuggestionsWrapper,
   Highlight,
   SearchIconWrapper,
-} from './Navbar.styles';
-import { useProductsContext } from '@/contexts/ProductsContext';
-import { useCategoriesContext } from '@/contexts/CategoriesContext';
+} from "./Navbar.styles";
+import { useProductsContext } from "@/contexts/ProductsContext";
+import { useCategoriesContext } from "@/contexts/CategoriesContext";
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const isMobile = useMediaQuery('(max-width:519px)');
-  const isTablet = useMediaQuery('(min-width:520px) and (max-width:900px)');
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+
+  const isMobile = useMediaQuery("(max-width:519px)");
+  const isTablet = useMediaQuery("(min-width:520px) and (max-width:900px)");
   const searchRef = useRef<HTMLDivElement>(null);
 
   // CART + USER
@@ -49,7 +57,6 @@ export default function Navbar() {
 
   // CATEGORIES
   const { categories } = useCategoriesContext();
-  const [selectedCategory, setSelectedCategory] = useState(AllProductsCategory);
 
   // CATEGORY DROPDOWN STATE
   const [catAnchor, setCatAnchor] = useState<null | HTMLElement>(null);
@@ -63,37 +70,45 @@ export default function Navbar() {
     setCatAnchor(null);
   };
 
-  const handleCategorySelect = (cat: string) => {
-    const capitalizedCategory = capitalizeCategory(cat);
+  // LOCAL SEARCH STATE (UI)
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(AllProductsCategory);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
 
-    setSelectedCategory(capitalizedCategory);
+  // INIT FROM URL WHEN IN SEARCH CONTEXT
+  useEffect(() => {
+  const isSearchContext =
+    location.pathname === "/" ||
+    location.pathname.startsWith("/search") ||
+    location.pathname.startsWith("/category");
 
-    const params = new URLSearchParams(location.search);
+  if (!isSearchContext) {
+    setSearchTerm("");
+    setSelectedCategory(AllProductsCategory);
+    setSuggestions([]);
+    return;
+  }
 
-    if (cat === AllProductsCategory) {
-      params.delete("cat");
-    } else {
-      params.set("cat", cat.toLowerCase());
-    }
-    navigate(`/search?${params.toString()}`);
+  const q = searchParams.get("q") || "";
+  const cat = searchParams.get("cat");
 
-    handleCloseCategories();
-  };
+  setSearchTerm(q);
+  setSelectedCategory(cat ? capitalizeCategory(cat) : AllProductsCategory);
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, [location.pathname, location.search]);
 
+
+
+  // CLICK OUTSIDE TO CLOSE SUGGESTIONS
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (
-        searchRef.current &&
-        !searchRef.current.contains(event.target as Node)
-      ) {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setSuggestions([]);
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   function highlightMatch(text: string, query: string) {
@@ -113,11 +128,7 @@ export default function Navbar() {
     );
   }
 
-  // SEARCH BAR STATE
-  const [searchTerm, setSearchTerm] = useState('');
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-
-  // LIVE SUGGESTIONS
+  // LIVE SUGGESTIONS (LOCAL ONLY, DOES NOT UPDATE RESULTS)
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
 
@@ -128,7 +139,6 @@ export default function Navbar() {
 
     let matches = allProducts;
 
-    // Apply category filter first
     if (selectedCategory !== AllProductsCategory) {
       matches = matches.filter(
         (p) =>
@@ -136,37 +146,72 @@ export default function Navbar() {
       );
     }
 
-    // Then apply search term
-    const suggestions = matches
+    const list = matches
       .filter((p) => p.title.toLowerCase().includes(value.toLowerCase()))
       .slice(0, 10)
       .map((p) => p.title);
 
-    setSuggestions(suggestions);
+    setSuggestions(list);
   };
 
-  // SUBMIT SEARCH
-  const handleSearchSubmit = () => {
-    const catParam =
-      selectedCategory === AllProductsCategory
-        ? ''
-        : selectedCategory.toLowerCase();
+  // CATEGORY SELECT (APPLIES CURRENT SEARCH TERM)
+  const handleCategorySelect = (cat: string) => {
+    const capitalized = capitalizeCategory(cat);
+    setSelectedCategory(capitalized);
 
-    navigate(`/search?q=${encodeURIComponent(searchTerm)}&cat=${catParam}`);
+    const params = new URLSearchParams();
+
+    if (searchTerm.trim()) {
+      params.set("q", searchTerm.trim());
+    }
+
+    if (cat !== AllProductsCategory) {
+      params.set("cat", cat.toLowerCase());
+    }
+
+    navigate(`/search?${params.toString()}`);
+    handleCloseCategories();
+  };
+
+  // SUBMIT SEARCH (ENTER OR ICON)
+  const handleSearchSubmit = () => {
+    const params = new URLSearchParams();
+
+    if (searchTerm.trim()) {
+      params.set("q", searchTerm.trim());
+    }
+
+    if (selectedCategory !== AllProductsCategory) {
+      params.set("cat", selectedCategory.toLowerCase());
+    }
+
+    // Always go to search/home context from anywhere (cart, product, etc.)
+    navigate(`/search?${params.toString()}`);
     setSuggestions([]);
   };
 
   // CLICK SUGGESTION
   const handleSuggestionClick = (title: string) => {
-    setSearchTerm(title); // keep UI in sync
-    
-    const params = new URLSearchParams(location.search);
+    setSearchTerm(title);
+
+    const params = new URLSearchParams();
     params.set("q", title);
 
-    navigate(`/search?${params.toString()}`);
+    if (selectedCategory !== AllProductsCategory) {
+      params.set("cat", selectedCategory.toLowerCase());
+    }
 
+    navigate(`/search?${params.toString()}`);
     setSuggestions([]);
   };
+
+  // ...rendering stays the same, just wire:
+  // - SearchInput.value = searchTerm
+  // - onChange = handleSearchChange
+  // - SearchForm.onSubmit = handleSearchSubmit
+  // - CategoryButton.onClick = handleOpenCategories
+  // - MenuItem.onClick = () => handleCategorySelect(cat)
+  // - suggestion MenuItem.onClick = () => handleSuggestionClick(suggestion)
 
   return (
     <StyledAppBar position="static">
@@ -209,7 +254,7 @@ export default function Navbar() {
                   <SearchInput
                     placeholder="Search products..."
                     value={searchTerm}
-                    onChange={(e) => handleSearchChange(e.target.value)}
+                    onChange={(e: { target: { value: string; }; }) => handleSearchChange(e.target.value)}
                   />
                   <SearchIconWrapper type="submit">
                     <SearchIcon />
@@ -263,7 +308,7 @@ export default function Navbar() {
                   <SearchInput
                     placeholder="Search products..."
                     value={searchTerm}
-                    onChange={(e) => handleSearchChange(e.target.value)}
+                    onChange={(e: { target: { value: string; }; }) => handleSearchChange(e.target.value)}
                   />
                   <SearchIconWrapper type="submit">
                     <SearchIcon />
