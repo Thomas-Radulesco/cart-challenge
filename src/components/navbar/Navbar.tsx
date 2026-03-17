@@ -258,21 +258,13 @@ export default function Navbar() {
                     value={searchTerm}
                     onChange={(e: { target: { value: string; }; }) => handleSearchChange(e.target.value)}
                   />{searchTerm && (
-                    <button
+                   <DeleteSearchTermButton
                       type="button"
                       onClick={handleClearSearch}
-                      style={{
-                        position: "absolute",
-                        right: isMobile ? "40px" : "48px",
-                        background: "transparent",
-                        border: "none",
-                        cursor: "pointer",
-                        fontSize: "18px",
-                        color: "#666",
-                      }}
+                      $isMobile={isMobile}
                     >
                       ×
-                    </button>
+                    </DeleteSearchTermButton>
                   )}
                   <SearchIconWrapper type="submit">
                     <SearchIcon />

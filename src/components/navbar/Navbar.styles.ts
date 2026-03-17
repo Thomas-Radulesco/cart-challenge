@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import InputBase from '@mui/material/InputBase';
 import Paper from '@mui/material/Paper';
-import { productTheme, secondary, navbarTheme } from '@/utils/colors';
+import { navbarTheme } from '@/utils/colors';
 
 export const StyledAppBar = styled(AppBar)`
   && {
