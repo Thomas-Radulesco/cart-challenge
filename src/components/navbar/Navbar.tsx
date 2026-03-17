@@ -9,9 +9,6 @@ import { useMediaQuery } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import Badge from "@mui/material/Badge";
 import Button from "@mui/material/Button";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useCart } from "@/contexts/CartContext";
 import { useUser } from "@/contexts/UserContext";
@@ -27,18 +24,11 @@ import {
   StyledToolbar,
   LogoImg,
   Brand,
-  SearchContainer,
-  SearchWrapper,
-  SearchForm,
-  CategoryButton,
-  SearchInput,
-  SuggestionsWrapper,
   Highlight,
-  SearchIconWrapper,
-  DeleteSearchTermButton,
 } from "./Navbar.styles";
 import { useProductsContext } from "@/contexts/ProductsContext";
 import { useCategoriesContext } from "@/contexts/CategoriesContext";
+import { SearchBar } from "./SearchBar";
 
 
 export default function Navbar() {
@@ -48,7 +38,7 @@ export default function Navbar() {
 
   const isMobile = useMediaQuery("(max-width:519px)");
   const isTablet = useMediaQuery("(min-width:520px) and (max-width:900px)");
-  const searchRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLDivElement | null>(null);
 
   // CART + USER
   const { cartCount } = useCart();
@@ -79,25 +69,25 @@ export default function Navbar() {
 
   // INIT FROM URL WHEN IN SEARCH CONTEXT
   useEffect(() => {
-  const isSearchContext =
-    location.pathname === "/" ||
-    location.pathname.startsWith("/search") ||
-    location.pathname.startsWith("/category");
+    const isSearchContext =
+      location.pathname === "/" ||
+      location.pathname.startsWith("/search") ||
+      location.pathname.startsWith("/category");
 
-  if (!isSearchContext) {
-    setSearchTerm("");
-    setSelectedCategory(AllProductsCategory);
-    setSuggestions([]);
-    return;
-  }
+    if (!isSearchContext) {
+      setSearchTerm("");
+      setSelectedCategory(AllProductsCategory);
+      setSuggestions([]);
+      return;
+    }
 
-  const q = searchParams.get("q") || "";
-  const cat = searchParams.get("cat");
+    const q = searchParams.get("q") || "";
+    const cat = searchParams.get("cat");
 
-  setSearchTerm(q);
-  setSelectedCategory(cat ? capitalizeCategory(cat) : AllProductsCategory);
-// eslint-disable-next-line react-hooks/exhaustive-deps
-}, [location.pathname, location.search]);
+    setSearchTerm(q);
+    setSelectedCategory(cat ? capitalizeCategory(cat) : AllProductsCategory);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname, location.search]);
 
 
 
@@ -218,141 +208,42 @@ export default function Navbar() {
   return (
     <StyledAppBar position="static">
       <StyledToolbar>
+        {/* LEFT SIDE — varies by device */}
         {isMobile ? (
-          <>
-            {/* MOBILE: logo + search only */}
-
-            <Link to="/" style={{ display: 'flex', alignItems: 'center' }}>
-              <LogoImg src={companyLogo} alt="Company logo" />
-            </Link>
-
-            <SearchContainer ref={searchRef}>
-              <SearchWrapper>
-                <SearchForm
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleSearchSubmit();
-                  }}
-                >
-                  <CategoryButton onClick={handleOpenCategories}>
-                    {selectedCategory}
-                  </CategoryButton>
-
-                  <Menu
-                    anchorEl={catAnchor}
-                    open={catOpen}
-                    onClose={handleCloseCategories}
-                  >
-                    {categories?.map((cat) => (
-                      <MenuItem
-                        key={cat}
-                        onClick={() => handleCategorySelect(cat)}
-                      >
-                        {capitalizeCategory(cat)}
-                      </MenuItem>
-                    ))}
-                  </Menu>
-
-                  <SearchInput
-                    placeholder="Search products..."
-                    value={searchTerm}
-                    onChange={(e: { target: { value: string; }; }) => handleSearchChange(e.target.value)}
-                  />{searchTerm && (
-                   <DeleteSearchTermButton
-                      type="button"
-                      onClick={handleClearSearch}
-                      $isMobile={isMobile}
-                    >
-                      ×
-                    </DeleteSearchTermButton>
-                  )}
-                  <SearchIconWrapper type="submit">
-                    <SearchIcon />
-                  </SearchIconWrapper>
-                </SearchForm>
-
-                {/* LIVE SUGGESTIONS DROPDOWN */}
-                {suggestions.length > 0 && (
-                  <SuggestionsWrapper>
-                    {suggestions.map((suggestion) => (
-                      <MenuItem
-                        key={suggestion}
-                        onClick={() => handleSuggestionClick(suggestion)}
-                      >
-                        {highlightMatch(suggestion, searchTerm)}
-                      </MenuItem>
-                    ))}
-                  </SuggestionsWrapper>
-                )}
-              </SearchWrapper>
-            </SearchContainer>
-          </>
+          <Link to="/" style={{ display: "flex", alignItems: "center" }}>
+            <LogoImg src={companyLogo} alt="Company logo" />
+          </Link>
         ) : (
+          <Brand to="/">Shop</Brand>
+        )}
+
+        {/* CENTER — always the same */}
+        <SearchBar
+          searchTerm={searchTerm}
+          selectedCategory={selectedCategory}
+          suggestions={suggestions}
+          categories={categories}
+          isMobile={isMobile}
+          catAnchor={catAnchor}
+          catOpen={catOpen}
+          searchRef={searchRef}
+          handleSearchChange={handleSearchChange}
+          handleSearchSubmit={handleSearchSubmit}
+          handleCategorySelect={handleCategorySelect}
+          handleOpenCategories={handleOpenCategories}
+          handleCloseCategories={handleCloseCategories}
+          handleSuggestionClick={handleSuggestionClick}
+          handleClearSearch={handleClearSearch}
+          highlightMatch={highlightMatch}
+        />
+
+        {/* RIGHT SIDE — desktop/tablet only */}
+        {!isMobile && (
           <>
-            <Brand to="/">Shop</Brand>
-            <SearchContainer ref={searchRef}>
-              <SearchWrapper>
-                <SearchForm
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleSearchSubmit();
-                  }}
-                >
-                  <CategoryButton onClick={handleOpenCategories}>
-                    {selectedCategory}
-                  </CategoryButton>
-                  <Menu
-                    anchorEl={catAnchor}
-                    open={catOpen}
-                    onClose={handleCloseCategories}
-                  >
-                    {categories?.map((cat) => (
-                      <MenuItem
-                        key={cat}
-                        onClick={() => handleCategorySelect(cat)}
-                      >
-                        {capitalizeCategory(cat)}
-                      </MenuItem>
-                    ))}
-                  </Menu>
-                  <SearchInput
-                    placeholder="Search products..."
-                    value={searchTerm}
-                    onChange={(e: { target: { value: string; }; }) => handleSearchChange(e.target.value)}
-                  />
-                  {searchTerm && (
-                    <DeleteSearchTermButton
-                      type="button"
-                      onClick={handleClearSearch}
-                      $isMobile={isMobile}
-                    >
-                      ×
-                    </DeleteSearchTermButton>
-                  )}
-                  <SearchIconWrapper type="submit">
-                    <SearchIcon />
-                  </SearchIconWrapper>
-                </SearchForm>
-
-                {suggestions.length > 0 && (
-                  <SuggestionsWrapper>
-                    {suggestions.map((suggestion) => (
-                      <MenuItem
-                        key={suggestion}
-                        onClick={() => handleSuggestionClick(suggestion)}
-                      >
-                        {highlightMatch(suggestion, searchTerm)}
-                      </MenuItem>
-                    ))}
-                  </SuggestionsWrapper>
-                )}
-              </SearchWrapper>
-            </SearchContainer>
-
             <IconButton
               component={Link}
               to="/cart"
-              size={isTablet ? 'small' : 'large'}
+              size={isTablet ? "small" : "large"}
               color="inherit"
             >
               <Badge badgeContent={cartCount} color="error">
