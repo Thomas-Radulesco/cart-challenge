@@ -5,14 +5,15 @@ import { Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import InputBase from '@mui/material/InputBase';
 import Paper from '@mui/material/Paper';
+import { productTheme, secondary, navbarTheme } from '@/utils/colors';
 
 export const StyledAppBar = styled(AppBar)`
   && {
     position: fixed;
     top: 0;
     left: 0;
-    background-color: #e4e5e6;
-    color: #000;
+    background-color: ${navbarTheme.background};
+    color: ${navbarTheme.text};
     z-index: 20;
   }
 `;
@@ -110,8 +111,8 @@ export const SearchForm = styled.form`
 
 export const CategoryButton = styled(Button)`
   && {
-    background-color: #f7f7f7;
-    color: #111;
+    background-color: ${navbarTheme.categoryButtonBackground};
+    color: ${navbarTheme.categoryButtonText};
     text-transform: none;
     border-radius: 6px 0 0 6px;
     border-right: none;
@@ -122,7 +123,7 @@ export const CategoryButton = styled(Button)`
     line-height: normal;
 
     &:hover {
-      background-color: #eee;
+      background-color: ${navbarTheme.categoryButtonHoverBckg};
     }
   }
 `;
@@ -148,11 +149,11 @@ export const SuggestionsWrapper = styled(Paper)`
 `;
 export const Highlight = styled.span`
   font-weight: bold;
-  color: #d35400;
+  color: ${navbarTheme.highlightSpanColor};
 `;
 
 export const SearchIconWrapper = styled.button`
-  background-color: #ff9900;
+  background-color: ${navbarTheme.searchIconWrapperBckgColor};
   border: none;
   padding: 6px 8px;
   height: 40px;
@@ -163,15 +164,15 @@ export const SearchIconWrapper = styled.button`
   cursor: pointer;
 
   &:hover {
-    background-color: #e68a00;
+    background-color: ${navbarTheme.searchIconWrapperHoverBckgColor};
   }
 
   &:active {
-    background-color: #cc7a00;
+    background-color: ${navbarTheme.searchIconWrapperActiveBckgColor};
   }
 
   svg {
-    color: #111;
+    color: ${navbarTheme.searchIconWrapperSVGColor};
   }
 `;
 
@@ -182,9 +183,9 @@ export const BottomNavContainer = styled.div`
   width: 100%;
   height: 56px;
 
-  background-color: #1b1b1b;
-  color: #e4e5e6;
-  border-top: 1px solid #e4e5e6;
+  background-color: ${navbarTheme.bottomNavContainerBckgColor};
+  color: ${navbarTheme.bottomNavContainerColor};
+  border-top: 1px solid ${navbarTheme.bottomNavContainerBorderColor};
 
   display: flex;
   align-items: center;
@@ -195,5 +196,26 @@ export const BottomNavContainer = styled.div`
 
   @media (min-width: 520px) {
     display: none;
+  }
+`;
+
+export const DeleteSearchTermButton = styled.button<{ $isMobile: boolean }>`
+  color: ${navbarTheme.deleteSearchTermButtonCol};
+  background-color: ${navbarTheme.categoryButtonBackground};
+  border-radius: 50%;
+  border: none;
+  position: absolute;
+  right: ${({ $isMobile }) => $isMobile ? "40px" : "48px"};
+  cursor: pointer;
+  font-size: 18px;
+  height: 1rem;
+  width: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: ${navbarTheme.categoryButtonHoverBckg};
   }
 `;

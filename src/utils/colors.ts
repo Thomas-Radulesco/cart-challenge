@@ -27,3 +27,21 @@ export const productTheme = {
   cardShadow: 'rgba(0, 0, 0, 0.15)',
   shortDescriptionColor: '#555',
 };
+
+export const navbarTheme = {
+  background: '#e4e5e6',
+  text: '#000',
+  categoryButtonBackground: '#f7f7f7',
+  categoryButtonText: '#111',
+  categoryButtonHoverBckg: '#eee',
+  deleteSearchTermButtonCol: '#555',
+  deleteSearchTermButtonBckg: '#666',
+  highlightSpanColor: '#d35400',
+  searchIconWrapperBckgColor: '#ff9900',
+  searchIconWrapperHoverBckgColor: '#e68a00',
+  searchIconWrapperActiveBckgColor: '#cc7a00',
+  searchIconWrapperSVGColor: '#111',
+  bottomNavContainerColor: '#e4e5e6',
+  bottomNavContainerBckgColor: '#1b1b1b',
+  bottomNavContainerBorderColor: '#e4e5e6',
+} 

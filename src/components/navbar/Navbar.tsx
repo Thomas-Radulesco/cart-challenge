@@ -35,9 +35,11 @@ import {
   SuggestionsWrapper,
   Highlight,
   SearchIconWrapper,
+  DeleteSearchTermButton,
 } from "./Navbar.styles";
 import { useProductsContext } from "@/contexts/ProductsContext";
 import { useCategoriesContext } from "@/contexts/CategoriesContext";
+
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -205,13 +207,13 @@ export default function Navbar() {
     setSuggestions([]);
   };
 
-  // ...rendering stays the same, just wire:
-  // - SearchInput.value = searchTerm
-  // - onChange = handleSearchChange
-  // - SearchForm.onSubmit = handleSearchSubmit
-  // - CategoryButton.onClick = handleOpenCategories
-  // - MenuItem.onClick = () => handleCategorySelect(cat)
-  // - suggestion MenuItem.onClick = () => handleSuggestionClick(suggestion)
+  const handleClearSearch = () => {
+    setSearchTerm("");
+    setSelectedCategory(AllProductsCategory);
+    setSuggestions([]);
+
+    navigate("/");
+  };
 
   return (
     <StyledAppBar position="static">
@@ -255,7 +257,23 @@ export default function Navbar() {
                     placeholder="Search products..."
                     value={searchTerm}
                     onChange={(e: { target: { value: string; }; }) => handleSearchChange(e.target.value)}
-                  />
+                  />{searchTerm && (
+                    <button
+                      type="button"
+                      onClick={handleClearSearch}
+                      style={{
+                        position: "absolute",
+                        right: isMobile ? "40px" : "48px",
+                        background: "transparent",
+                        border: "none",
+                        cursor: "pointer",
+                        fontSize: "18px",
+                        color: "#666",
+                      }}
+                    >
+                      ×
+                    </button>
+                  )}
                   <SearchIconWrapper type="submit">
                     <SearchIcon />
                   </SearchIconWrapper>
@@ -310,6 +328,15 @@ export default function Navbar() {
                     value={searchTerm}
                     onChange={(e: { target: { value: string; }; }) => handleSearchChange(e.target.value)}
                   />
+                  {searchTerm && (
+                    <DeleteSearchTermButton
+                      type="button"
+                      onClick={handleClearSearch}
+                      $isMobile={isMobile}
+                    >
+                      ×
+                    </DeleteSearchTermButton>
+                  )}
                   <SearchIconWrapper type="submit">
                     <SearchIcon />
                   </SearchIconWrapper>
