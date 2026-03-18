@@ -39,6 +39,7 @@ export default function Navbar() {
   const isMobile = useMediaQuery("(max-width:519px)");
   const isTablet = useMediaQuery("(min-width:520px) and (max-width:900px)");
   const searchRef = useRef<HTMLDivElement | null>(null);
+  const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
 
   // CART + USER
   const { cartCount } = useCart();
@@ -59,6 +60,7 @@ export default function Navbar() {
   };
 
   const handleCloseCategories = () => {
+    setHighlightedIndex(-1);
     setCatAnchor(null);
   };
 
@@ -122,6 +124,7 @@ export default function Navbar() {
 
   // LIVE SUGGESTIONS (LOCAL ONLY, DOES NOT UPDATE RESULTS)
   const handleSearchChange = (value: string) => {
+    setHighlightedIndex(-1);
     setSearchTerm(value);
 
     if (!value.trim() || !allProducts) {
@@ -184,6 +187,7 @@ export default function Navbar() {
 
   // CLICK SUGGESTION
   const handleSuggestionClick = (title: string) => {
+    setHighlightedIndex(-1);
     setSearchTerm(title);
 
     const params = new URLSearchParams();
@@ -198,6 +202,7 @@ export default function Navbar() {
   };
 
   const handleClearSearch = () => {
+    setHighlightedIndex(-1);
     setSearchTerm("");
     setSelectedCategory(AllProductsCategory);
     setSuggestions([]);
@@ -235,6 +240,9 @@ export default function Navbar() {
           handleSuggestionClick={handleSuggestionClick}
           handleClearSearch={handleClearSearch}
           highlightMatch={highlightMatch}
+          setSuggestions={setSuggestions}
+          highlightedIndex={highlightedIndex}
+          setHighlightedIndex={setHighlightedIndex}
         />
 
         {/* RIGHT SIDE — desktop/tablet only */}

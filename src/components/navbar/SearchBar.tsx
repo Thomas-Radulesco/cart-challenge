@@ -10,7 +10,7 @@ import {
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import SearchIcon from "@mui/icons-material/Search";
-import { DeleteSearchTermButton } from "./Navbar.styles"; // your styled clear button
+import { DeleteSearchTermButton } from "./Navbar.styles";
 import type { RefObject, ReactNode } from "react";
 
 export interface SearchBarProps {
@@ -30,6 +30,9 @@ export interface SearchBarProps {
   handleSuggestionClick: (title: string) => void;
   handleClearSearch: () => void;
   highlightMatch: (text: string, query: string) => ReactNode;
+  setSuggestions: React.Dispatch<React.SetStateAction<string[]>>;
+  highlightedIndex: number;
+  setHighlightedIndex: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export function SearchBar({
@@ -49,7 +52,48 @@ export function SearchBar({
   handleSuggestionClick,
   handleClearSearch,
   highlightMatch,
+  setSuggestions,
+  highlightedIndex,
+  setHighlightedIndex,
 }: SearchBarProps) {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const count = suggestions.length;
+
+    if (count === 0) return;
+
+    switch (e.key) {
+      case "ArrowDown":
+      case "Tab":
+        if (e.shiftKey) {
+          // SHIFT + TAB → previous
+          e.preventDefault();
+          setHighlightedIndex((prev) => (prev - 1 + count) % count);
+        } else {
+          // TAB → next
+          e.preventDefault();
+          setHighlightedIndex((prev) => (prev + 1) % count);
+        }
+        break;
+
+      case "ArrowUp":
+        e.preventDefault();
+        setHighlightedIndex((prev) => (prev - 1 + count) % count);
+        break;
+
+      case "Escape":
+        setSuggestions([]);
+        setHighlightedIndex(-1);
+        break;
+
+      case "Enter":
+        if (highlightedIndex >= 0) {
+          e.preventDefault();
+          handleSuggestionClick(suggestions[highlightedIndex]);
+        }
+        break;
+    }
+  };
+
   return (
     <SearchContainer ref={searchRef}>
       <SearchWrapper>
@@ -79,6 +123,7 @@ export function SearchBar({
             placeholder="Search products..."
             value={searchTerm}
             onChange={(e) => handleSearchChange(e.target.value)}
+            onKeyDown={(e) => handleKeyDown(e)}
           />
 
           {searchTerm && (
@@ -98,10 +143,11 @@ export function SearchBar({
 
         {suggestions.length > 0 && (
           <SuggestionsWrapper>
-            {suggestions.map((suggestion) => (
+            {suggestions.map((suggestion, index) => (
               <MenuItem
                 key={suggestion}
                 onClick={() => handleSuggestionClick(suggestion)}
+                selected={index === highlightedIndex}
               >
                 {highlightMatch(suggestion, searchTerm)}
               </MenuItem>
