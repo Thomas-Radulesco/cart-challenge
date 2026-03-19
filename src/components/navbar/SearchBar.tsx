@@ -10,8 +10,10 @@ import {
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import SearchIcon from "@mui/icons-material/Search";
+import Divider from "@mui/material/Divider";
 import { DeleteSearchTermButton } from "./Navbar.styles";
 import type { RefObject, ReactNode } from "react";
+import { useEffect } from "react";
 
 export interface SearchBarProps {
   searchTerm: string;
@@ -33,6 +35,10 @@ export interface SearchBarProps {
   setSuggestions: React.Dispatch<React.SetStateAction<string[]>>;
   highlightedIndex: number;
   setHighlightedIndex: React.Dispatch<React.SetStateAction<number>>;
+  recentSearches: string[];
+  addRecentSearch: (term: string) => void;
+  isDropdownOpen: boolean;
+  setIsDropdownOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export function SearchBar({
@@ -55,9 +61,33 @@ export function SearchBar({
   setSuggestions,
   highlightedIndex,
   setHighlightedIndex,
+  recentSearches,
+  addRecentSearch,
+  isDropdownOpen,
+  setIsDropdownOpen,
 }: SearchBarProps) {
+  const isShowingRecent = searchTerm?.length === 0 && recentSearches?.length > 0;
+  const combinedList = isShowingRecent ? recentSearches : suggestions;
+  const closeDropdown = () => {
+    setIsDropdownOpen(false);
+    setSuggestions([]);
+    setHighlightedIndex(-1);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        closeDropdown();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchRef]);
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const count = suggestions.length;
+    const count = combinedList.length;
 
     if (count === 0) return;
 
@@ -81,8 +111,7 @@ export function SearchBar({
         break;
 
       case "Escape":
-        setSuggestions([]);
-        setHighlightedIndex(-1);
+        closeDropdown();
         break;
 
       case "Enter":
@@ -122,8 +151,13 @@ export function SearchBar({
           <SearchInput
             placeholder="Search products..."
             value={searchTerm}
-            onChange={(e) => handleSearchChange(e.target.value)}
+            onChange={(e) => {
+              handleSearchChange(e.target.value);
+              setIsDropdownOpen(true);
+            }}
             onKeyDown={(e) => handleKeyDown(e)}
+            onFocus={() => setIsDropdownOpen(true)}
+            onClick={() => setIsDropdownOpen(true)}
           />
 
           {searchTerm && (
@@ -140,20 +174,44 @@ export function SearchBar({
             <SearchIcon />
           </SearchIconWrapper>
         </SearchForm>
-
-        {suggestions.length > 0 && (
+        {isDropdownOpen && (
           <SuggestionsWrapper>
-            {suggestions.map((suggestion, index) => (
-              <MenuItem
-                key={suggestion}
-                onClick={() => handleSuggestionClick(suggestion)}
-                selected={index === highlightedIndex}
-              >
-                {highlightMatch(suggestion, searchTerm)}
-              </MenuItem>
-            ))}
+            {/* RECENT SEARCHES */}
+            {isShowingRecent && (
+              <>
+                <MenuItem disabled>Recent searches</MenuItem>
+                {recentSearches.map((term, index) => (
+                  <MenuItem
+                    key={term}
+                    onClick={() => handleSuggestionClick(term)}
+                    selected={index === highlightedIndex}
+                  >
+                    {term}
+                  </MenuItem>
+                ))}
+
+                {suggestions.length > 0 && <Divider />}
+              </>
+            )}
+            {/* LIVE SUGGESTIONS */}
+            {!isShowingRecent && suggestions.length > 0 && (
+              suggestions.map((suggestion, index) => (
+                <MenuItem
+                  key={suggestion}
+                  onClick={() => handleSuggestionClick(suggestion)}
+                  selected={index === highlightedIndex}
+                >
+                  {highlightMatch(suggestion, searchTerm)}
+                </MenuItem>
+              ))
+            )}
+            {/* NO SUGGESTIONS */}
+            {!isShowingRecent && searchTerm.length > 0 && suggestions.length === 0 && (
+              <MenuItem disabled>No suggestions found</MenuItem>
+            )}
           </SuggestionsWrapper>
         )}
+
       </SearchWrapper>
     </SearchContainer>
   );

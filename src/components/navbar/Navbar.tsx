@@ -40,6 +40,11 @@ export default function Navbar() {
   const isTablet = useMediaQuery("(min-width:520px) and (max-width:900px)");
   const searchRef = useRef<HTMLDivElement | null>(null);
   const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => {
+    const saved = localStorage.getItem("recentSearches");
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // CART + USER
   const { cartCount } = useCart();
@@ -68,6 +73,16 @@ export default function Navbar() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(AllProductsCategory);
   const [suggestions, setSuggestions] = useState<string[]>([]);
+
+  // SAVE NEW SEARCHES
+  const addRecentSearch = (term: string) => {
+    if (!term.trim()) return;
+    setRecentSearches((prev) => {
+      const updated = [term, ...prev.filter((t) => t !== term)].slice(0, 5);
+      localStorage.setItem("recentSearches", JSON.stringify(updated));
+      return updated;
+    });
+  };
 
   // INIT FROM URL WHEN IN SEARCH CONTEXT
   useEffect(() => {
@@ -174,6 +189,7 @@ export default function Navbar() {
 
     if (searchTerm.trim()) {
       params.set("q", searchTerm.trim());
+      addRecentSearch(searchTerm.trim());
     }
 
     if (selectedCategory !== AllProductsCategory) {
@@ -183,13 +199,15 @@ export default function Navbar() {
     // Always go to search/home context from anywhere (cart, product, etc.)
     navigate(`/search?${params.toString()}`);
     setSuggestions([]);
+    setIsDropdownOpen(false);
+    setHighlightedIndex(-1);
   };
 
   // CLICK SUGGESTION
   const handleSuggestionClick = (title: string) => {
     setHighlightedIndex(-1);
     setSearchTerm(title);
-
+    addRecentSearch(title);
     const params = new URLSearchParams();
     params.set("q", title);
 
@@ -199,6 +217,8 @@ export default function Navbar() {
 
     navigate(`/search?${params.toString()}`);
     setSuggestions([]);
+    setIsDropdownOpen(false);
+    setHighlightedIndex(-1);
   };
 
   const handleClearSearch = () => {
@@ -243,6 +263,10 @@ export default function Navbar() {
           setSuggestions={setSuggestions}
           highlightedIndex={highlightedIndex}
           setHighlightedIndex={setHighlightedIndex}
+          recentSearches={recentSearches}
+          addRecentSearch={addRecentSearch}
+          isDropdownOpen={isDropdownOpen}
+          setIsDropdownOpen={setIsDropdownOpen}
         />
 
         {/* RIGHT SIDE — desktop/tablet only */}
